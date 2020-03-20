@@ -1,17 +1,13 @@
 <template>
   <span>
+    <Loading :active.sync="isLoading" :can-cancel="false" :is-full-page="true"></Loading>
     <div class="container mt-4">
       <div class="row">
         <div class="col">
           <ContactList :contacts="contacts" />
         </div>
         <div class="col-8">
-          <ContactDetails :contact="routeContact" />
-        </div>
-      </div>
-      <div class="row mt-3">
-        <div class="col">
-          <ContactForm @onSubmit="addContact" />
+          <ContactDetails :contact="routeContact" @onDelete="deleteContact" />
         </div>
       </div>
     </div>
@@ -21,39 +17,22 @@
 <script>
 import ContactList from '../components/ContactList.vue';
 import ContactDetails from '../components/ContactDetails.vue';
-import ContactForm from '../components/ContactForm.vue';
+import { contacts } from '../services/Contacts.js';
+// Import component
+import Loading from 'vue-loading-overlay';
+// Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 export default {
   components: {
     ContactList,
     ContactDetails,
-    ContactForm
+    Loading
   },
   data() {
     return {
-      contacts: [
-        {
-          id: 1,
-          first_name: 'John',
-          last_name: 'Doe',
-          email: 'johndoe@example.com',
-          number: '555-12345'
-        },
-        {
-          id: 2,
-          first_name: 'Pera',
-          last_name: 'Peric',
-          email: 'peraperic@example.com',
-          number: '555-54321'
-        },
-        {
-          id: 3,
-          first_name: 'Sava',
-          last_name: 'Katic',
-          email: 'sava.k@example.com',
-          number: '555-67890'
-        }
-      ]
+      contacts: [],
+      isLoading: false
     };
   },
   computed: {
@@ -63,9 +42,19 @@ export default {
   },
   methods: {
     addContact(contact) {
-      console.log(contact); // eslint-disable-line
       this.contacts.push(contact);
+    },
+    deleteContact(id) {
+      let index = this.contacts.findIndex(contact => contact.id === id);
+      this.contacts.splice(index, 1);
     }
+  },
+  created() {
+    this.isLoading = true;
+    contacts.getAll().then(response => {
+      this.isLoading = false;
+      this.contacts = response.data;
+    });
   }
 };
 </script>

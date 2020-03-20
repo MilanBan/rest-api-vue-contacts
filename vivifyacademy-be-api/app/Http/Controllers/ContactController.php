@@ -37,11 +37,16 @@ class ContactController extends Controller
      */
     public function store(Request $request)
     {
+        if (!$request->has(['first_name', 'last_name', 'email', 'number'])) {
+            abort(400);
+        }
+
         $contact = new Contact();
 
         $contact->first_name = $request->input('first_name');
         $contact->last_name = $request->input('last_name');
         $contact->email = $request->input('email');
+        $contact->number = $request->input('number');
 
         $contact->save();
 
@@ -79,12 +84,16 @@ class ContactController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (!$request->has(['first_name', 'last_name', 'email', 'number'])) {
+            abort(400);
+        }
 
-        $contact = Contact::findOrFail($id);
+        $contact = Contact::find($id);
 
         $contact->first_name = $request->input('first_name');
         $contact->last_name = $request->input('last_name');
         $contact->email = $request->input('email');
+        $contact->number = $request->input('number');
 
         $contact->save();
 
